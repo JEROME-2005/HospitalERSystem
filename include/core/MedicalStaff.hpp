@@ -11,63 +11,77 @@ private:
     std::string staffID;
     std::string name;
     StaffRole role;
-    std::string currentLocation;
+    std::string currentLocation;       // Current room ID
     AvailabilityStatus status;
-    std::string specialization;
     std::vector<std::string> assignedPatientIDs;
-    int maxPatientLoad;
+    std::vector<std::string> specializations;
+    int experienceYears;
     time_t shiftStartTime;
-    int shiftDurationHours;
+    time_t shiftEndTime;
 
 public:
-    // Constructors
+    // ==================== CONSTRUCTORS ====================
+    
     MedicalStaff();
-    MedicalStaff(const std::string& id, const std::string& staffName, StaffRole staffRole);
-    MedicalStaff(const std::string& id, const std::string& staffName, StaffRole staffRole,
-                 const std::string& spec, int maxLoad);
+    MedicalStaff(const std::string& name, StaffRole role);
+    MedicalStaff(const std::string& id, const std::string& name, 
+                 StaffRole role, const std::string& location);
     
-    // Copy constructor and assignment
-    MedicalStaff(const MedicalStaff& other);
-    MedicalStaff& operator=(const MedicalStaff& other);
+    // ==================== ASSIGNMENT MANAGEMENT ====================
     
-    // Destructor
-    ~MedicalStaff() = default;
-    
-    // Staff management
+    // Assign patient to this staff member
     bool assignPatient(const std::string& patientID);
-    bool unassignPatient(const std::string& patientID);
-    bool hasPatient(const std::string& patientID) const;
-    bool canTakeMorePatients() const;
-    int getCurrentPatientCount() const;
     
-    // Getters
+    // Unassign patient
+    bool unassignPatient(const std::string& patientID);
+    
+    // Check if staff is handling a patient
+    bool isHandlingPatient(const std::string& patientID) const;
+    
+    // Get number of assigned patients
+    int getPatientLoad() const { return assignedPatientIDs.size(); }
+    
+    // ==================== SPECIALIZATION ====================
+    
+    void addSpecialization(const std::string& spec);
+    bool hasSpecialization(const std::string& spec) const;
+    
+    // ==================== GETTERS ====================
+    
     std::string getStaffID() const { return staffID; }
     std::string getName() const { return name; }
     StaffRole getRole() const { return role; }
     std::string getCurrentLocation() const { return currentLocation; }
     AvailabilityStatus getStatus() const { return status; }
-    std::string getSpecialization() const { return specialization; }
     std::vector<std::string> getAssignedPatientIDs() const { return assignedPatientIDs; }
-    int getMaxPatientLoad() const { return maxPatientLoad; }
-    bool isAvailable() const { return status == AvailabilityStatus::AVAILABLE && canTakeMorePatients(); }
+    std::vector<std::string> getSpecializations() const { return specializations; }
+    int getExperienceYears() const { return experienceYears; }
     
-    // Setters
-    void setStaffID(const std::string& id) { staffID = id; }
+    // Check if staff is available
+    bool isAvailable() const { return status == AvailabilityStatus::AVAILABLE; }
+    
+    // ==================== SETTERS ====================
+    
     void setName(const std::string& n) { name = n; }
     void setRole(StaffRole r) { role = r; }
     void setCurrentLocation(const std::string& loc) { currentLocation = loc; }
     void setStatus(AvailabilityStatus s) { status = s; }
-    void setSpecialization(const std::string& spec) { specialization = spec; }
-    void setMaxPatientLoad(int max) { maxPatientLoad = max; }
+    void setExperienceYears(int years) { experienceYears = years; }
+    void setShiftTimes(time_t start, time_t end);
     
-    // Utility
-    std::string toString() const;
-    void printInfo() const;
-    double getWorkloadPercentage() const;
+    // ==================== UTILITY FUNCTIONS ====================
     
-    // Comparison
-    bool operator==(const MedicalStaff& other) const;
-    bool operator<(const MedicalStaff& other) const; // For priority queue (less workload = higher priority)
+    // Print staff information
+    void print() const;
+    
+    // Get brief summary
+    std::string getSummary() const;
+    
+    // Check if currently on shift
+    bool isOnShift() const;
+    
+    // Calculate priority for assignment (based on load, experience, etc.)
+    int calculateAssignmentPriority() const;
 };
 
 } // namespace HEROS
