@@ -1,5 +1,6 @@
 #include "../../include/algorithms/Graph.hpp"
 #include <iostream>
+#include <iomanip>  // ADD THIS LINE
 #include <cmath>
 #include <algorithm>
 
@@ -72,7 +73,7 @@ double Graph::calculateEuclideanDistance(const std::string& node1, const std::st
 }
 
 void Graph::display() const {
-    std::cout << "\n╔════════════════════════════════════════════════╗\n";
+    std::cout << "\n╔══════════════════════════��═════════════════════╗\n";
     std::cout << "║           HOSPITAL LAYOUT GRAPH                ║\n";
     std::cout << "╠════════════════════════════════════════════════╣\n";
     std::cout << "║ Vertices (Rooms): " << std::setw(28) << vertexCount << " ║\n";

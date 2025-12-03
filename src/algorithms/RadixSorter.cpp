@@ -1,6 +1,7 @@
 #include "../../include/algorithms/RadixSorter.hpp"
 #include <algorithm>
 #include <iostream>
+#include <iomanip>  // ADD THIS LINE
 
 void RadixSorter::sortPatientsByID(std::vector<Patient>& patients) {
     if (patients.empty()) return;
@@ -61,7 +62,7 @@ void RadixSorter::radixSortNumeric(std::vector<int>& arr) {
         std::vector<int> output(arr.size());
         std::vector<int> count(10, 0);
         
-        for (int i = 0; i < arr.size(); i++) {
+        for (size_t i = 0; i < arr.size(); i++) {
             count[(arr[i] / exp) % 10]++;
         }
         

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>  // ADD THIS LINE
 
 DijkstraRouter::DijkstraRouter(Graph* graph) : hospitalMap(graph) {}
 

@@ -11,20 +11,21 @@ EmergencyResponseSystem::EmergencyResponseSystem()
     registerRooms();
     registerStaff();
     
-    staffRouter = std::make_unique<DijkstraRouter>(&hospitalLayout);
-    equipmentDistributor = std::make_unique<MSTGenerator>(&hospitalLayout);
+    // C++11 compatible way (instead of make_unique which is C++14)
+    staffRouter.reset(new DijkstraRouter(&hospitalLayout));
+    equipmentDistributor.reset(new MSTGenerator(&hospitalLayout));
     
     systemInitialized = true;
     
-    std::cout << "\n✓ H.E.R.O.S System Initialized Successfully!\n";
+    std::cout << "\n* H.E.R.O.S System Initialized Successfully!\n";
 }
 
 EmergencyResponseSystem::~EmergencyResponseSystem() {
-    std::cout << "\n✓ H.E.R.O.S System Shutdown Complete\n";
+    std::cout << "\n* H.E.R.O.S System Shutdown Complete\n";
 }
 
 void EmergencyResponseSystem::initializeHospitalLayout() {
-    std::cout << "→ Initializing hospital layout...\n";
+    std::cout << "-> Initializing hospital layout...\n";
     
     // Create hospital graph with rooms as nodes
     hospitalLayout.addNode("ENTRANCE", Coordinates(0, 0));
@@ -53,7 +54,7 @@ void EmergencyResponseSystem::initializeHospitalLayout() {
     hospitalLayout.addBidirectionalEdge("LAB", "WARD_A", 7);
     hospitalLayout.addBidirectionalEdge("LAB", "ICU_2", 7);
     
-    std::cout << "✓ Hospital layout initialized\n";
+    std::cout << "* Hospital layout initialized\n";
 }
 
 void EmergencyResponseSystem::registerRooms() {
@@ -63,7 +64,7 @@ void EmergencyResponseSystem::registerRooms() {
     roomRegistry["WARD_A"] = HospitalRoom("WARD_A", RoomType::WARD, Coordinates(10, 10), 20);
     roomRegistry["WARD_B"] = HospitalRoom("WARD_B", RoomType::WARD, Coordinates(0, 10), 20);
     
-    std::cout << "✓ " << roomRegistry.size() << " rooms registered\n";
+    std::cout << "* " << roomRegistry.size() << " rooms registered\n";
 }
 
 void EmergencyResponseSystem::registerStaff() {
@@ -75,14 +76,14 @@ void EmergencyResponseSystem::registerStaff() {
     staffRegistry["NR003"] = MedicalStaff("NR003", "Nurse Sophie Taylor", StaffRole::NURSE);
     staffRegistry["PM001"] = MedicalStaff("PM001", "Paramedic David Kim", StaffRole::PARAMEDIC);
     
-    std::cout << "✓ " << staffRegistry.size() << " staff members registered\n";
+    std::cout << "* " << staffRegistry.size() << " staff members registered\n";
 }
 
 void EmergencyResponseSystem::registerNewPatient(const Patient& patient) {
     PerformanceMonitor::startTimer("Patient Registration");
     
     if (!DataValidator::validatePatientData(patient)) {
-        std::cout << "✗ Patient validation failed!\n";
+        std::cout << "* Patient validation failed!\n";
         return;
     }
     
@@ -101,7 +102,7 @@ void EmergencyResponseSystem::registerNewPatient(const Patient& patient) {
     
     PerformanceMonitor::stopTimer("Patient Registration");
     
-    std::cout << "✓ Patient " << patient.getPatientID() << " registered successfully\n";
+    std::cout << "* Patient " << patient.getPatientID() << " registered successfully\n";
 }
 
 void EmergencyResponseSystem::assignStaffToPatient(const std::string& staffID, 
@@ -110,7 +111,7 @@ void EmergencyResponseSystem::assignStaffToPatient(const std::string& staffID,
     auto patientIt = patientRegistry.find(patientID);
     
     if (staffIt == staffRegistry.end() || patientIt == patientRegistry.end()) {
-        std::cout << "✗ Staff or Patient not found!\n";
+        std::cout << "* Staff or Patient not found!\n";
         return;
     }
     
@@ -124,7 +125,7 @@ void EmergencyResponseSystem::assignStaffToPatient(const std::string& staffID,
     staffIt->second.assignToPatient(patientID);
     totalStaffAssignments++;
     
-    std::cout << "✓ " << staffIt->second.getName() << " assigned to patient " 
+    std::cout << "* " << staffIt->second.getName() << " assigned to patient " 
               << patientID << "\n";
     std::cout << "  Route distance: " << std::fixed << std::setprecision(2) 
               << route.totalDistance << "m\n";
@@ -152,7 +153,7 @@ Patient EmergencyResponseSystem::processNextCriticalPatient() {
 }
 
 void EmergencyResponseSystem::optimizeEquipmentDistribution() {
-    std::cout << "\n→ Optimizing equipment distribution using MST...\n";
+    std::cout << "\n-> Optimizing equipment distribution using MST...\n";
     
     PerformanceMonitor::startTimer("MST Generation");
     
@@ -163,7 +164,7 @@ void EmergencyResponseSystem::optimizeEquipmentDistribution() {
     
     equipmentDistributor->displayMST(mst);
     
-    std::cout << "\n✓ Equipment distribution optimized!\n";
+    std::cout << "\n* Equipment distribution optimized!\n";
     std::cout << "  Cable savings: " << std::fixed << std::setprecision(1) 
               << equipmentDistributor->calculateOptimizationPercentage(mst) << "%\n";
 }
@@ -182,14 +183,14 @@ RouteInfo EmergencyResponseSystem::findFastestRoute(const std::string& from,
 
 void EmergencyResponseSystem::undoLastOperation() {
     if (undoSystem.isEmpty()) {
-        std::cout << "✗ No operations to undo!\n";
+        std::cout << "* No operations to undo!\n";
         return;
     }
     
     // Stack pop: O(1)
     PatientState lastState = undoSystem.pop();
     
-    std::cout << "⟲ Undoing: ";
+    std::cout << "Undoing: ";
     lastState.display();
     
     // Restore previous state
@@ -198,40 +199,40 @@ void EmergencyResponseSystem::undoLastOperation() {
 }
 
 void EmergencyResponseSystem::generatePerformanceReport() const {
-    std::cout << "\n╔════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║              H.E.R.O.S PERFORMANCE REPORT                  ║\n";
-    std::cout << "╠════════════════════════════════════════════════════════════╣\n";
-    std::cout << "║ Total Patients Registered:    " << std::setw(27) 
-              << totalPatientsRegistered << " ║\n";
-    std::cout << "║ Patients in Triage Queue:     " << std::setw(27) 
-              << triageSystem.getPendingCount() << " ║\n";
-    std::cout << "║ Total Patients Processed:     " << std::setw(27) 
-              << triageSystem.getTotalProcessed() << " ║\n";
-    std::cout << "║ Staff Assignments Made:       " << std::setw(27) 
-              << totalStaffAssignments << " ║\n";
-    std::cout << "║ Available Undo Operations:    " << std::setw(27) 
-              << undoSystem.size() << " ║\n";
-    std::cout << "╚════════════════════════════════════════════════════════════╝\n";
+    std::cout << "\n============================================================\n";
+    std::cout << "              H.E.R.O.S PERFORMANCE REPORT                  \n";
+    std::cout << "============================================================\n";
+    std::cout << " Total Patients Registered:    " << std::setw(27) 
+              << totalPatientsRegistered << " \n";
+    std::cout << " Patients in Triage Queue:     " << std::setw(27) 
+              << triageSystem.getPendingCount() << " \n";
+    std::cout << " Total Patients Processed:     " << std::setw(27) 
+              << triageSystem.getTotalProcessed() << " \n";
+    std::cout << " Staff Assignments Made:       " << std::setw(27) 
+              << totalStaffAssignments << " \n";
+    std::cout << " Available Undo Operations:    " << std::setw(27) 
+              << undoSystem.size() << " \n";
+    std::cout << "============================================================\n";
     
     PerformanceMonitor::displayReport();
     PerformanceMonitor::displayComplexityAnalysis();
 }
 
 void EmergencyResponseSystem::displaySystemStatus() const {
-    std::cout << "\n╔════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║              H.E.R.O.S SYSTEM STATUS                       ║\n";
-    std::cout << "╠════════════════════════════════════════════════════════════╣\n";
-    std::cout << "║ System Status:               " 
-              << (systemInitialized ? "✓ OPERATIONAL" : "✗ OFFLINE") << std::setw(18) << " ║\n";
-    std::cout << "║ Registered Rooms:            " << std::setw(27) 
-              << roomRegistry.size() << " ║\n";
-    std::cout << "║ Registered Staff:            " << std::setw(27) 
-              << staffRegistry.size() << " ║\n";
-    std::cout << "║ Graph Vertices:              " << std::setw(27) 
-              << hospitalLayout.getVertexCount() << " ║\n";
-    std::cout << "║ Graph Edges:                 " << std::setw(27) 
-              << hospitalLayout.getEdgeCount() << " ║\n";
-    std::cout << "╚════════════════════════════════════════════════════════════╝\n";
+    std::cout << "\n============================================================\n";
+    std::cout << "              H.E.R.O.S SYSTEM STATUS                       \n";
+    std::cout << "============================================================\n";
+    std::cout << " System Status:               " 
+              << (systemInitialized ? "* OPERATIONAL" : "* OFFLINE") << std::setw(18) << " \n";
+    std::cout << " Registered Rooms:            " << std::setw(27) 
+              << roomRegistry.size() << " \n";
+    std::cout << " Registered Staff:            " << std::setw(27) 
+              << staffRegistry.size() << " \n";
+    std::cout << " Graph Vertices:              " << std::setw(27) 
+              << hospitalLayout.getVertexCount() << " \n";
+    std::cout << " Graph Edges:                 " << std::setw(27) 
+              << hospitalLayout.getEdgeCount() << " \n";
+    std::cout << "============================================================\n";
 }
 
 void EmergencyResponseSystem::displayTriageQueue() const {
@@ -240,14 +241,14 @@ void EmergencyResponseSystem::displayTriageQueue() const {
 
 void EmergencyResponseSystem::simulateEmergencyScenario(const SimulationConfig& config) {
     std::cout << "\n" << std::string(60, '=') << "\n";
-    std::cout << "   🚨 EMERGENCY SCENARIO SIMULATION 🚨\n";
+    std::cout << "   EMERGENCY SCENARIO SIMULATION\n";
     std::cout << std::string(60, '=') << "\n";
     
     // Generate synthetic patients
     std::vector<Patient> patients = Simulation::generateSyntheticPatientData(config.patientCount);
     
     // Register all patients
-    std::cout << "\n→ Registering " << patients.size() << " emergency patients...\n";
+    std::cout << "\n-> Registering " << patients.size() << " emergency patients...\n";
     for (const Patient& p : patients) {
         registerNewPatient(p);
     }
@@ -256,7 +257,7 @@ void EmergencyResponseSystem::simulateEmergencyScenario(const SimulationConfig& 
     displayTriageQueue();
     
     // Process critical patients
-    std::cout << "\n→ Processing critical patients...\n";
+    std::cout << "\n-> Processing critical patients...\n";
     for (int i = 0; i < std::min(5, config.patientCount); i++) {
         if (!triageSystem.isEmpty()) {
             Patient p = processNextCriticalPatient();
@@ -268,7 +269,7 @@ void EmergencyResponseSystem::simulateEmergencyScenario(const SimulationConfig& 
     optimizeEquipmentDistribution();
     
     // Test routing
-    std::cout << "\n→ Testing emergency routing...\n";
+    std::cout << "\n-> Testing emergency routing...\n";
     RouteInfo route = findFastestRoute("ENTRANCE", "ICU_1");
     staffRouter->displayRoute(route);
     

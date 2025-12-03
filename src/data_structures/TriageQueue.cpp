@@ -1,6 +1,7 @@
 #include "../../include/data_structures/TriageQueue.hpp"
 #include <iostream>
 #include <algorithm>
+#include <iomanip>  // ADD THIS LINE
 
 TriageQueue::TriageQueue() : totalPatientsProcessed(0) {}
 
