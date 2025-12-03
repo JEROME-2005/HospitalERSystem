@@ -1,49 +1,78 @@
 @echo off
+cls
 echo ========================================
-echo  H.E.R.O.S Build Script (MinGW-32)
+echo  H.E.R.O.S Final Build
 echo ========================================
 
-REM Create build directory
-if not exist build mkdir build
+REM Clean
+if exist build rmdir /s /q build
+if exist hospital.exe del hospital.exe
+mkdir build
 
 echo.
-echo [1/5] Compiling Core modules...
-g++ -std=c++11 -Iinclude -c src/core/Patient.cpp -o build/Patient.o
-g++ -std=c++11 -Iinclude -c src/core/HospitalRoom.cpp -o build/HospitalRoom.o
-g++ -std=c++11 -Iinclude -c src/core/MedicalStaff.cpp -o build/MedicalStaff.o
-g++ -std=c++11 -Iinclude -c src/core/EmergencyResponseSystem.cpp -o build/EmergencyResponseSystem.o
+echo Compiling Core...
+g++ -std=c++11 -Iinclude -c src/core/Patient.cpp -o build/Patient.o 2>build/error.log
+if errorlevel 1 goto :error
 
-echo [2/5] Compiling Data Structures...
-g++ -std=c++11 -Iinclude -c src/data_structures/TriageQueue.cpp -o build/TriageQueue.o
-g++ -std=c++11 -Iinclude -c src/data_structures/PatientState.cpp -o build/PatientState.o
+g++ -std=c++11 -Iinclude -c src/core/HospitalRoom.cpp -o build/HospitalRoom.o 2>>build/error.log
+if errorlevel 1 goto :error
 
-echo [3/5] Compiling Algorithms...
-g++ -std=c++11 -Iinclude -c src/algorithms/Graph.cpp -o build/Graph.o
-g++ -std=c++11 -Iinclude -c src/algorithms/DijkstraRouter.cpp -o build/DijkstraRouter.o
-g++ -std=c++11 -Iinclude -c src/algorithms/MSTGenerator.cpp -o build/MSTGenerator.o
-g++ -std=c++11 -Iinclude -c src/algorithms/RadixSorter.cpp -o build/RadixSorter.o
-g++ -std=c++11 -Iinclude -c src/algorithms/QuickSorter.cpp -o build/QuickSorter.o
+g++ -std=c++11 -Iinclude -c src/core/MedicalStaff.cpp -o build/MedicalStaff.o 2>>build/error.log
+if errorlevel 1 goto :error
 
-echo [4/5] Compiling Utilities...
-g++ -std=c++11 -Iinclude -c src/utils/PerformanceMonitor.cpp -o build/PerformanceMonitor.o
-g++ -std=c++11 -Iinclude -c src/utils/DataValidator.cpp -o build/DataValidator.o
-g++ -std=c++11 -Iinclude -c src/utils/Simulation.cpp -o build/Simulation.o
+g++ -std=c++11 -Iinclude -c src/core/EmergencyResponseSystem.cpp -o build/EmergencyResponseSystem.o 2>>build/error.log
+if errorlevel 1 goto :error
 
-echo [5/5] Linking executable...
-g++ -std=c++11 -Iinclude main.cpp build/*.o -o hospital.exe
+echo Compiling Data Structures...
+g++ -std=c++11 -Iinclude -c src/data_structures/TriageQueue.cpp -o build/TriageQueue.o 2>>build/error.log
+if errorlevel 1 goto :error
 
-if exist hospital.exe (
-    echo.
-    echo ========================================
-    echo  BUILD SUCCESSFUL!
-    echo ========================================
-    echo  Run: hospital.exe
-    echo ========================================
-) else (
-    echo.
-    echo ========================================
-    echo  BUILD FAILED!
-    echo ========================================
-)
+g++ -std=c++11 -Iinclude -c src/data_structures/PatientState.cpp -o build/PatientState.o 2>>build/error.log
+if errorlevel 1 goto :error
 
+echo Compiling Algorithms...
+g++ -std=c++11 -Iinclude -c src/algorithms/Graph.cpp -o build/Graph.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/algorithms/DijkstraRouter.cpp -o build/DijkstraRouter.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/algorithms/MSTGenerator.cpp -o build/MSTGenerator.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/algorithms/RadixSorter.cpp -o build/RadixSorter.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/algorithms/QuickSorter.cpp -o build/QuickSorter.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+echo Compiling Utilities...
+g++ -std=c++11 -Iinclude -c src/utils/PerformanceMonitor.cpp -o build/PerformanceMonitor.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/utils/DataValidator.cpp -o build/DataValidator.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+g++ -std=c++11 -Iinclude -c src/utils/Simulation.cpp -o build/Simulation.o 2>>build/error.log
+if errorlevel 1 goto :error
+
+echo Linking...
+g++ -std=c++11 -Iinclude main.cpp build/*.o -o hospital.exe 2>>build/error.log
+if errorlevel 1 goto :error
+
+echo.
+echo ========================================
+echo  SUCCESS! Run: hospital.exe
+echo ========================================
+goto :end
+
+:error
+echo.
+echo ========================================
+echo  BUILD FAILED!
+echo ========================================
+type build\error.log
+echo.
+
+:end
 pause

@@ -3,12 +3,12 @@
 #include <algorithm>
 
 HospitalRoom::HospitalRoom() 
-    : roomID("R000"), type(RoomType::WARD), occupied(false), 
-      capacity(1), currentOccupancy(0) {}
+    : roomID("R000"), type(RoomType::WARD), position(),
+      occupied(false), capacity(1), currentOccupancy(0) {}
 
 HospitalRoom::HospitalRoom(const std::string& id, RoomType t, Coordinates pos, int cap)
-    : roomID(id), type(t), position(pos), capacity(cap), 
-      occupied(false), currentOccupancy(0) {}
+    : roomID(id), type(t), position(pos),
+      occupied(false), capacity(cap), currentOccupancy(0) {}
 
 bool HospitalRoom::addEquipment(const std::string& equipmentName) {
     equipment.push_back(equipmentName);

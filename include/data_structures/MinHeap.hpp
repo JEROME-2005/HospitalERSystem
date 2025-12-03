@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
 
 template<typename T>
 class MinHeap {
@@ -11,36 +12,31 @@ private:
     std::vector<T> heapArray;
     int heapSize;
     
-    // Helper functions
     int parent(int i) const { return (i - 1) / 2; }
     int leftChild(int i) const { return 2 * i + 1; }
     int rightChild(int i) const { return 2 * i + 2; }
     
-    void heapifyDown(int index);      // O(log n)
-    void heapifyUp(int index);        // O(log n)
+    void heapifyDown(int index);
+    void heapifyUp(int index);
 
 public:
     MinHeap();
     
-    // Core operations
-    void insert(const T& item);                           // O(log n)
-    T extractMin();                                       // O(log n)
-    T getMin() const;                                     // O(1)
-    bool isEmpty() const { return heapSize == 0; }        // O(1)
-    int size() const { return heapSize; }                 // O(1)
-    void buildHeap(const std::vector<T>& elements);       // O(n)
-    void clear() { heapArray.clear(); heapSize = 0; }     // O(1)
+    void insert(const T& item);
+    T extractMin();
+    T getMin() const;
+    bool isEmpty() const { return heapSize == 0; }
+    int size() const { return heapSize; }
+    void buildHeap(const std::vector<T>& elements);
+    void clear() { heapArray.clear(); heapSize = 0; }
     
-    // Debug
     void display() const;
     const std::vector<T>& getHeapArray() const { return heapArray; }
 };
 
-// Template implementation must be in header file
-
 template<typename T>
 MinHeap<T>::MinHeap() : heapSize(0) {
-    heapArray.reserve(100); // Pre-allocate space
+    heapArray.reserve(100);
 }
 
 template<typename T>
@@ -113,7 +109,6 @@ void MinHeap<T>::buildHeap(const std::vector<T>& elements) {
     heapArray = elements;
     heapSize = elements.size();
     
-    // Start from last non-leaf node and heapify down
     for (int i = heapSize / 2 - 1; i >= 0; i--) {
         heapifyDown(i);
     }
@@ -128,4 +123,4 @@ void MinHeap<T>::display() const {
     std::cout << std::endl;
 }
 
-#endif // MIN_HEAP_HPP
+#endif
