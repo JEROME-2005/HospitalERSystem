@@ -3,150 +3,57 @@
 
 #include <vector>
 #include <stdexcept>
-#include <iostream>
 
-namespace DataStructures {
+template<typename T>
+class StateStack {
+private:
+    std::vector<T> stack;
+    size_t maxSize;
 
-    /**
-     * StateStack Template Class
-     * 
-     * A generic stack implementation for undo/redo functionality.
-     * Stores state snapshots for reverting operations.
-     * 
-     * Time Complexities:
-     * - push(): O(1) amortized
-     * - pop(): O(1)
-     * - peek(): O(1)
-     * 
-     * Space Complexity: O(m) where m is max history size
-     */
-    template<typename T>
-    class StateStack {
-    private:
-        std::vector<T> stack;
-        size_t maxSize;
-        size_t currentSize;
+public:
+    StateStack(size_t max = 100) : maxSize(max) {}
+    
+    void push(const T& state);              // O(1) amortized
+    T pop();                                // O(1)
+    T peek() const;                         // O(1)
+    void clear();                           // O(1)
+    bool isEmpty() const { return stack.empty(); }
+    size_t size() const { return stack.size(); }
+    bool isFull() const { return stack.size() >= maxSize; }
+};
 
-    public:
-        // Constructors
-        StateStack(size_t maxHistorySize = 100);
-        StateStack(const StateStack<T>& other);
-        
-        // Destructor
-        ~StateStack();
+// Template implementation
 
-        // Assignment operator
-        StateStack<T>& operator=(const StateStack<T>& other);
-
-        // Core Stack Operations
-        void push(const T& state);
-        T pop();
-        T peek() const;
-        
-        // Utility Methods
-        bool isEmpty() const { return currentSize == 0; }
-        bool isFull() const { return currentSize >= maxSize; }
-        size_t size() const { return currentSize; }
-        size_t capacity() const { return maxSize; }
-        void clear();
-        void resize(size_t newMaxSize);
-        
-        // Access Methods
-        T getAt(size_t index) const;
-        std::vector<T> getAllStates() const { return stack; }
-        
-        // Display
-        void display() const;
-    };
-
-    // ==================== IMPLEMENTATION ====================
-
-    template<typename T>
-    StateStack<T>::StateStack(size_t maxHistorySize) 
-        : maxSize(maxHistorySize), currentSize(0) {
-        stack.reserve(maxHistorySize);
+template<typename T>
+void StateStack<T>::push(const T& state) {
+    if (isFull()) {
+        // Remove oldest state (bottom of stack)
+        stack.erase(stack.begin());
     }
+    stack.push_back(state);
+}
 
-    template<typename T>
-    StateStack<T>::StateStack(const StateStack<T>& other)
-        : stack(other.stack), maxSize(other.maxSize), currentSize(other.currentSize) {}
-
-    template<typename T>
-    StateStack<T>::~StateStack() {
-        clear();
+template<typename T>
+T StateStack<T>::pop() {
+    if (isEmpty()) {
+        throw std::runtime_error("Stack is empty!");
     }
+    T state = stack.back();
+    stack.pop_back();
+    return state;
+}
 
-    template<typename T>
-    StateStack<T>& StateStack<T>::operator=(const StateStack<T>& other) {
-        if (this != &other) {
-            stack = other.stack;
-            maxSize = other.maxSize;
-            currentSize = other.currentSize;
-        }
-        return *this;
+template<typename T>
+T StateStack<T>::peek() const {
+    if (isEmpty()) {
+        throw std::runtime_error("Stack is empty!");
     }
+    return stack.back();
+}
 
-    template<typename T>
-    void StateStack<T>::push(const T& state) {
-        if (currentSize >= maxSize) {
-            // Remove oldest state (front of vector) to maintain max size
-            stack.erase(stack.begin());
-            currentSize--;
-        }
-        stack.push_back(state);
-        currentSize++;
-    }
-
-    template<typename T>
-    T StateStack<T>::pop() {
-        if (isEmpty()) {
-            throw std::runtime_error("Stack is empty - cannot pop");
-        }
-        T topState = stack.back();
-        stack.pop_back();
-        currentSize--;
-        return topState;
-    }
-
-    template<typename T>
-    T StateStack<T>::peek() const {
-        if (isEmpty()) {
-            throw std::runtime_error("Stack is empty - cannot peek");
-        }
-        return stack.back();
-    }
-
-    template<typename T>
-    void StateStack<T>::clear() {
-        stack.clear();
-        currentSize = 0;
-    }
-
-    template<typename T>
-    void StateStack<T>::resize(size_t newMaxSize) {
-        maxSize = newMaxSize;
-        while (currentSize > maxSize) {
-            stack.erase(stack.begin());
-            currentSize--;
-        }
-    }
-
-    template<typename T>
-    T StateStack<T>::getAt(size_t index) const {
-        if (index >= currentSize) {
-            throw std::out_of_range("Index out of range");
-        }
-        return stack[index];
-    }
-
-    template<typename T>
-    void StateStack<T>::display() const {
-        std::cout << "StateStack [size=" << currentSize << "/" << maxSize << "]" << std::endl;
-        for (size_t i = currentSize; i > 0; i--) {
-            std::cout << "  [" << (currentSize - i) << "] " << stack[i-1] << std::endl;
-        }
-    }
-
-} // namespace DataStructures
+template<typename T>
+void StateStack<T>::clear() {
+    stack.clear();
+}
 
 #endif // STATE_STACK_HPP
